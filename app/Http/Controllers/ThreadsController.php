@@ -26,6 +26,10 @@ class ThreadsController extends Controller
 
         $threads = $this->getThreads($channel, $filters);
 
+        if(request()->wantsJson()){
+            return $threads;
+        }
+
         return view('threads.index', compact('threads'));
     }
 
@@ -119,12 +123,12 @@ class ThreadsController extends Controller
      */
     protected function getThreads(Channel $channel = null, ThreadFilters $filters)
     {
-        $threads = Thread::latest()->filter($filters)->get();
+        $threads = Thread::filter($filters);
 
         if ($channel) {
             $threads = $threads->where('channel_id', $channel->id);
         }
 
-        return $threads;
+        return $threads->latest()->get();
     }
 }

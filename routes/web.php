@@ -33,7 +33,6 @@ Route::get('/threads/{channel}/{thread}', 'ThreadsController@show');
 
 Route::post('/threads', 'ThreadsController@store');
 
-
-//Route::resource('/threads', 'ThreadsController');
-
 Route::post('/threads/{channel}/{thread}/replies', 'RepliesController@store')->middleware('auth');
+
+Route::post('/replies/{reply}/favourites', 'FavouritesController@store');

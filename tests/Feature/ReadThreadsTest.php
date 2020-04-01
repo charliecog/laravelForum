@@ -34,7 +34,7 @@ class ReadThreadsTest extends TestCase
              ->assertSee($this->thread->title);
 
     }
-    
+
     /** @test */
     public function a_user_can_read_replies_that_are_associated_with_a_thread()
     {
@@ -43,7 +43,7 @@ class ReadThreadsTest extends TestCase
         $this->get($this->thread->path())
              ->assertSee($reply->body);
     }
-    
+
     /** @test */
     public function a_user_can_filter_threads_according_to_a_channel()
     {
@@ -68,6 +68,27 @@ class ReadThreadsTest extends TestCase
         //see those threads
         $this->get("/threads?by=JohnDoe")
              ->assertSee($threadByJohn->title)
-             ->assertDontSee($threadNotByJohn->title);;
+             ->assertDontSee($threadNotByJohn->title);
+    }
+
+    /** @test */
+    public function a_user_can_filter_threads_by_popularity()
+    {
+        //given we have three threads
+
+        //with 2 replies, 3 replies and 0 replies respectively
+        $threadWithTwoReplies = create('App\Thread');
+        create('App\Reply', ['thread_id' => $threadWithTwoReplies->id], 2);
+
+        $threadWithThreeReplies = create('App\Thread');
+        create('App\Reply', ['thread_id' => $threadWithThreeReplies->id], 3);
+
+        $threadWithNoReplies = $this->thread;
+
+        //when I filter all threads by popularity
+        $response = $this->getJson("/threads?popular=1")->json();
+
+        //then they should be returned from most replies to least
+        $this->assertEquals([3, 2, 0], array_column($response, 'replies_count'));
     }
 }
